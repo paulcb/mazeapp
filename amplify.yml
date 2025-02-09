@@ -3,10 +3,10 @@ frontend:
   phases:
     preBuild:
       commands:
+        - REACT_APP_test=${REACT_APP_test}
         - npm ci --cache .npm --prefer-offline
     build:
       commands:
-        - echo "REACT_APP_test=${REACT_APP_test}" >> .env
         - npm run build
   artifacts:
     baseDirectory: build
