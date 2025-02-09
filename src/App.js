@@ -1,4 +1,6 @@
 export default function Board() {
+  const ENV = process.env;
+  console.log("secret value test: ", ENV);
   return (
     <>
       <div className="board-row">
