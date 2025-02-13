@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import Maze from './maze.js'
+import { testMaze } from './maze-test.js';
 
-function Square({ borders , mapKey}) {
+function Square({ borders, mapKey }) {
   const [value, setValue] = useState(null);
   // const [borders, setborders] = useState(bordersIn);
   function handleClick() {
@@ -27,11 +28,11 @@ function Square({ borders , mapKey}) {
   );
 }
 
-const maze = new Maze();
+const maze = new Maze(testMaze);
 
 export default function Board() {
   // const ENV = process.env;
-  // console.log("secret value test: ", ENV);
+  // console.log("env: ", ENV);
   return (
     <>
       {maze.board.map((row, i) => (
