@@ -1,63 +1,247 @@
 
+class Boarders {
+    constructor(up = 0, down = 0, left = 0, right = 0, key = null) {
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+        this.key = key;
+    }
+}
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function compareNumbers(a, b) {
+    return a.size - b.size;
+}
+
 export default class Maze {
     constructor() {
+        this.board = [];
+        this.graph = new Map();
         this.generateMaze();
     }
-    board = [];
-    graph = new Map();
+
+    addAdjacentNode(set, key1, key2) {
+        // console.log(set);
+        // console.log(`key1 ${key1} key2 ${key2}`);
+        if (set.has(key2)) {
+            // console.log(set);
+            // console.log(`key1 ${key1} key2 ${key2}`);
+            // console.log(this.graph[key2]);
+            // console.log(this.graph[key1]);
+            this.graph[key2].add(key1);
+            this.graph[key1].add(key2);
+
+            return true;
+        }
+
+        return false;
+    }
 
     generateMaze() {
-        const edgeRage = 0.5;
+        const edgeRage = 0.55;
         const rowsLen = 15;
         const colsLen = 10;
         for (let i = 0; i < rowsLen; i++) {
             const boardRow = [];
             for (let j = 0; j < colsLen; j++) {
-                const up = Math.random() > edgeRage ? 1 : 0;
-                const down = Math.random() > edgeRage ? 1 : 0;
-                const left = Math.random() > edgeRage ? 1 : 0;
-                const right = Math.random() > edgeRage ? 1 : 0;
-
                 const key = `${i} ${j}`;
-                let nodes = [];
-                let borders = { up: up, down: down, left: left, right: right, key: key };
+                const upKey = `${i - 1} ${j}`;
+                const downKey = `${i + 1} ${j}`;
+                const rightKey = `${i} ${j + 1}`;
+                const leftKey = `${i} ${j - 1}`;
 
-                if (i - 1 < 0) borders.up = 1;
-                if (i + 1 >= rowsLen) borders.down = 1;
-                if (j + 1 >= colsLen) borders.right = 1;
-                if (j - 1 < 0) borders.left = 1;
+                let nodes = new Set();
+                let borders = {
+                    up: Math.random() > edgeRage ? 1 : 0,
+                    down: Math.random() > edgeRage ? 1 : 0,
+                    left: Math.random() > edgeRage ? 1 : 0,
+                    right: Math.random() > edgeRage ? 1 : 0,
+                    key: key
+                };
 
-                if (borders.up == 0) nodes.push(`${i - 1} ${j}`);
-                if (borders.down == 0) nodes.push(`${i + 1} ${j}`);
-                if (borders.left == 0) nodes.push(`${i} ${j - 1}`);
-                if (borders.right == 0) nodes.push(`${i} ${j + 1}`);
+                if (i - 1 < 0) {
+                    borders.up = 1;
+                } else {
+                    if (borders.up == 1 && this.graph[upKey].has(key)) {
+                        this.graph[upKey].delete(key);
+                    }
+
+                    if (borders.up == 0 && !this.graph[upKey].has(key)) {
+                        this.graph[upKey].add(key);
+                    }
+                }
+
+                if (i + 1 >= rowsLen) {
+                    borders.down = 1;
+                }
+
+                if (j + 1 >= colsLen) {
+                    borders.right = 1;
+                }
+
+                if (j - 1 < 0) {
+                    borders.left = 1;
+                } else {
+                    if (borders.left == 1 && this.graph[leftKey].has(key)) {
+                        this.graph[leftKey].delete(key);
+                    }
+
+                    if (borders.left == 0 && !this.graph[leftKey].has(key)) {
+                        this.graph[leftKey].add(key);
+                    }
+                }
+
+
+                if (borders.up == 0) nodes.add(upKey);
+                if (borders.down == 0) nodes.add(downKey);
+                if (borders.right == 0) nodes.add(rightKey);
+                if (borders.left == 0) nodes.add(leftKey);
+
 
                 this.graph[key] = nodes;
-                boardRow.push(borders);
-                // borders.up = 1;
-                // borders.down = 1;
-                // borders.left = 1;
-                // borders.right = 1;
-                // console.log(borders);
             }
+        }
 
+        let graphGroups = [];
+        let globalVisited = new Set();
+        for (let key in this.graph) {
+            if (globalVisited.has(key)) continue;
+            let visited = new Set();
+            let stack = [key];
+            while (stack.length != 0) {
+                const node = stack.pop();
+                if (!visited.has(node)) {
+                    visited.add(node);
+                    globalVisited.add(node);
+                    const nodes = this.graph[node];
+                    for (const entry of nodes) {
+                        if (!visited.has(entry)) {
+                            stack.push(entry);
+                        }
+                    }
+                }
+            }
+            graphGroups.push(visited);
+        }
+
+        graphGroups.sort(compareNumbers).reverse();
+        let largestGroup = graphGroups.shift();
+        let largestGroupSize = largestGroup.size;
+        const maxMazeSize = (rowsLen * colsLen);
+        const maxIteration = graphGroups.size;
+        let iteration = 0;
+        while (largestGroupSize < maxMazeSize || iteration >= maxIteration) {
+            for (let set of graphGroups) {
+                for (const entry of largestGroup) {
+                    const split = entry.split(" ");
+                    const row = Number.parseInt(split[0]);
+                    const col = Number.parseInt(split[1]);
+
+                    const upKey = `${row - 1} ${col}`;
+                    const downKey = `${row + 1} ${col}`;
+                    const rightKey = `${row} ${col + 1}`;
+                    const leftKey = `${row} ${col - 1}`;
+
+                    if (this.addAdjacentNode(set, entry, upKey)) {
+                        largestGroupSize += set.size;
+                        break;
+                    }
+                    if (this.addAdjacentNode(set, entry, downKey)) {
+                        largestGroupSize += set.size;
+                        break;
+                    }
+                    if (this.addAdjacentNode(set, entry, rightKey)) {
+                        largestGroupSize += set.size;
+                        break;
+                    }
+                    if (this.addAdjacentNode(set, entry, leftKey)) {
+                        largestGroupSize += set.size;
+                        break;
+                    }
+                }
+
+                if (largestGroupSize < maxMazeSize) break;
+
+            }
+            iteration += 1;
+        }
+
+        graphGroups = [];
+        globalVisited = new Set();
+        for (let key in this.graph) {
+            if (globalVisited.has(key)) continue;
+            let visited = new Set();
+            let stack = [key];
+            while (stack.length != 0) {
+                const node = stack.pop();
+                if (!visited.has(node)) {
+                    visited.add(node);
+                    globalVisited.add(node);
+                    const nodes = this.graph[node];
+                    for (const entry of nodes) {
+                        if (!visited.has(entry)) {
+                            stack.push(entry);
+                        }
+                    }
+                }
+            }
+            graphGroups.push(visited);
+        }
+        graphGroups.sort(compareNumbers).reverse();
+        // console.log("graphGroups", graphGroups);
+
+        for (let i = 0; i < rowsLen; i++) {
+            const boardRow = [];
+            for (let j = 0; j < colsLen; j++) {
+                const key = `${i} ${j}`;
+                const upKey = `${i - 1} ${j}`;
+                const downKey = `${i + 1} ${j}`;
+                const rightKey = `${i} ${j + 1}`;
+                const leftKey = `${i} ${j - 1}`;
+                let borders = {
+                    up: this.graph[key].has(upKey) ? 0 : 1,
+                    down: this.graph[key].has(downKey) ? 0 : 1,
+                    left: this.graph[key].has(leftKey) ? 0 : 1,
+                    right: this.graph[key].has(rightKey) ? 0 : 1,
+                    key: `${i} ${j}`
+                };
+                boardRow.push(borders);
+            }
             this.board.push(boardRow);
         }
 
-        console.log("graph", this.graph);
+        // console.log("graph", this.graph);
 
-        const borderCount = (rowsLen * 2) + (colsLen * 2);
-        const start = getRandomInt(0, borderCount - 1);
-        let end = start + (borderCount / 2);
-        if (end > borderCount) end = end - borderCount;
-        console.log("boarderCount", borderCount);
-        console.log("start", start);
-        console.log("end", end);
+        // const borderCount = (rowsLen * 2) + (colsLen * 2);
+        // const start = getRandomInt(0, borderCount - 1);
+        // let end = start + (borderCount / 2);
+        // if (end > borderCount) end = end - borderCount;
+        // console.log("boarderCount", borderCount);
+        // console.log("start", start);
+        // console.log("end", end);
+
+        // let dist = new Array(maxMazeSize);
+        // let sptSet = new Array(maxMazeSize);
+
+        // // Initialize all distances as 
+        // // INFINITE and stpSet[] as false 
+        // for (let i = 0; i < maxMazeSize; i++) {
+        //     dist[i] = Number.MAX_VALUE;
+        //     sptSet[i] = false;
+        // }
+
+        // // Distance of source vertex 
+        // // from itself is always 0 
+        // dist[0] = 0;
+
+        // console.log(dist);
+        // console.log(sptSet);
     }
+
 }
