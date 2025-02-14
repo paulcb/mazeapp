@@ -22,7 +22,8 @@ function Square({ borders, mapKey }) {
           fontSize: 8,
         }}
       >
-        {borders.key}
+        {borders.inPath ? "X" : ""}
+
       </button>
     </>
   );
