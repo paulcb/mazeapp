@@ -24,39 +24,43 @@ export default class Maze {
         this.edgeRage = 0.55;
         this.rowsLen = 15;
         this.colsLen = 10;
+        this.maxMazeSize = this.colsLen * this.rowsLen;
         this.board = [];
         this.graph = new Map();
         if (!testMaze) {
             this.generateMaze();
-            this.buildBoard();
         }
         else {
-            // this.graph = new Map(Object.entries(JSON.parse(testMaze)));
             for (let entry of testMaze) {
                 this.graph[entry[0]] = new Set();
                 for (let edge of entry[1]) {
                     this.graph[entry[0]].add(edge);
                 }
             }
-            this.buildBoard();
 
         }
+        this.buildBoard();
+        this.findLongestEdgePath();
+    }
+
+    neighbors(node) {
+        const split = node.split(" ");
+        const row = Number.parseInt(split[0]);
+        const col = Number.parseInt(split[1]);
+
+        const upKey = `${row - 1} ${col}`;
+        const downKey = `${row + 1} ${col}`;
+        const rightKey = `${row} ${col + 1}`;
+        const leftKey = `${row} ${col - 1}`;
+        return { up: upKey, down: downKey, right: rightKey, left: leftKey }
     }
 
     addAdjacentNode(set, key1, key2) {
-        // console.log(set);
-        // console.log(`key1 ${key1} key2 ${key2}`);
         if (set.has(key2)) {
-            // console.log(set);
-            // console.log(`key1 ${key1} key2 ${key2}`);
-            // console.log(this.graph[key2]);
-            // console.log(this.graph[key1]);
             this.graph[key2].add(key1);
             this.graph[key1].add(key2);
-
             return true;
         }
-
         return false;
     }
 
@@ -80,6 +84,121 @@ export default class Maze {
             }
             this.board.push(boardRow);
         }
+    }
+
+    breadthFirstSearch(source, dest = null, findMax = false) {
+        let s = new Set();
+        let dist = new Map();
+        let paths = new Map();
+        for (let entry in this.graph) {
+            dist[entry] = Infinity;
+        }
+
+        dist[source] = 0;
+        paths[source] = [source];
+        let q = [];
+        q.push(source);
+        let found = false;
+        while (q.size != 0 || found) {
+
+            let node = q.shift();
+            if (node == undefined) break;
+
+            s.add(node);
+            for (let n of this.graph[node]) {
+                if (!s.has(n) && dist[node] + 1 < dist[n]) {
+                    dist[n] = dist[node] + 1;
+                    if (!paths.has(n))
+                        paths[n] = [];
+                    paths[n].push(node);
+
+                    if (dest != null && n == dest) {
+                        found = true;
+                        break;
+                    }
+
+                    // console.log(`n ${n} node ${node}`);
+                    q.push(n);
+                }
+            }
+        }
+        let max = null;
+        if (findMax) {
+            for (let d in dist) {
+                // console.log("d", dist[d]);
+                if (dist[d] == Infinity) continue;
+                if (max == null) max = [d, dist[d]];
+                if (dist[d] > max[1]) max = [d, dist[d]];
+            }
+        }
+        // console.log("entry", entry, "max", max);
+        // console.log("path", paths[entry]);
+        if (found) {
+            let p = paths[dest];
+            console.log("path", p);
+            while (p != source) {
+                console.log("path", p);
+                p = paths[p];
+                // break;
+            }
+        }
+
+        return [paths, max, source]
+    }
+
+    findLongestEdgePath() {
+        let lsp = null;
+        for (let entry in this.graph) {
+            const split = entry.split(" ");
+            const row = Number.parseInt(split[0]);
+            const col = Number.parseInt(split[1]);
+
+            if (!((row - 1 < 0) || (row + 1 >= this.rowsLen) || (col + 1 >= this.colsLen) || (col - 1 < 0))) continue;
+
+            // let s = new Set();
+            // let dist = new Map();
+            // let paths = new Map();
+            // for (let entry in this.graph) {
+            //     dist[entry] = Infinity;
+            // }
+
+            // dist[entry] = 0;
+            // paths[entry] = [entry];
+            // let q = [];
+            // q.push(entry);
+            // while (q.size != 0) {
+
+            //     let node = q.shift();
+            //     if (node == undefined) break;
+
+            //     s.add(node);
+            //     for (let n of this.graph[node]) {
+            //         if (!s.has(n) && dist[node] + 1 < dist[n]) {
+            //             dist[n] = dist[node] + 1;
+            //             if (!paths.has(n))
+            //                 paths[n] = [];
+            //             paths[n].push(node);
+            //             // console.log(`n ${n} node ${node}`);
+            //             q.push(n);
+            //         }
+            //     }
+            // }
+            // let max = null;
+            // for (let d in dist) {
+            //     // console.log("d", d, "dis", dist[d]);
+            //     if (dist[d] == Infinity) continue;
+            //     if (max == null) max = [d, dist[d]];
+            //     if (dist[d] > max[1]) max = [d, dist[d]];
+            // }
+            // // console.log("entry", entry, "max", max);
+            // // console.log("path", paths[entry]);
+            // let p = paths[max[0]];
+            const [paths, max] = this.breadthFirstSearch(entry, null, true);
+            if (lsp == null) lsp = max;
+            if (lsp[1] < max[1]) lsp = max;
+        }
+        console.log("lsp", lsp);
+
     }
 
     findGroups() {
@@ -111,7 +230,6 @@ export default class Maze {
     generateMaze() {
 
         for (let i = 0; i < this.rowsLen; i++) {
-            const boardRow = [];
             for (let j = 0; j < this.colsLen; j++) {
                 const key = `${i} ${j}`;
                 const upKey = `${i - 1} ${j}`;
@@ -170,13 +288,14 @@ export default class Maze {
                 this.graph[key] = nodes;
             }
         }
+
         let graphGroups = this.findGroups();
+
         let largestGroup = graphGroups.shift();
         let largestGroupSize = largestGroup.size;
-        const maxMazeSize = (this.rowsLen * this.colsLen);
         const maxIteration = graphGroups.size;
         let iteration = 0;
-        while (largestGroupSize < maxMazeSize || iteration >= maxIteration) {
+        while (largestGroupSize < this.maxMazeSize || iteration >= maxIteration) {
             for (let set of graphGroups) {
                 for (const entry of largestGroup) {
                     const split = entry.split(" ");
@@ -206,48 +325,11 @@ export default class Maze {
                     }
                 }
 
-                if (largestGroupSize < maxMazeSize) break;
+                if (largestGroupSize < this.maxMazeSize) break;
 
             }
             iteration += 1;
         }
-        
-        // graphGroups.sort(compareNumbers).reverse();
-        // console.log("graphGroups", graphGroups);
-        // console.log(this.graph);
-        // console.log(JSON.stringify(this.graph));
-
-        // let outputMaze=[];
-        // for (let entry in this.graph) {
-
-        //     const edges = [...this.graph[entry]];
-        //     outputMaze.push([entry, edges]);
-        // }
-        // console.log(JSON.stringify(outputMaze));
     }
 
-    // const borderCount = (this.rowsLen * 2) + (this.colsLen * 2);
-    // const start = getRandomInt(0, borderCount - 1);
-    // let end = start + (borderCount / 2);
-    // if (end > borderCount) end = end - borderCount;
-    // console.log("boarderCount", borderCount);
-    // console.log("start", start);
-    // console.log("end", end);
-
-    // let dist = new Array(maxMazeSize);
-    // let sptSet = new Array(maxMazeSize);
-
-    // // Initialize all distances as 
-    // // INFINITE and stpSet[] as false 
-    // for (let i = 0; i < maxMazeSize; i++) {
-    //     dist[i] = Number.MAX_VALUE;
-    //     sptSet[i] = false;
-    // }
-
-    // // Distance of source vertex 
-    // // from itself is always 0 
-    // dist[0] = 0;
-
-    // console.log(dist);
-    // console.log(sptSet);
 }
