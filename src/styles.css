@@ -70,6 +70,9 @@ body {
   text-align: center;
   width: 34px;
 }
+.square:hover{
+  background-color: #999;
+}
 
 .board-row:after {
   clear: both;

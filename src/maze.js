@@ -24,10 +24,11 @@ export default class Maze {
         this.edgeRage = 0.5;
         this.rowsLen = 15;
         this.colsLen = 10;
-        this.maxMazeSize = this.colsLen * this.rowsLen;
+        this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * .68);
         this.board = [];
         this.graph = new Map();
         this.rPath = null;
+        this.debug = true;
         if (!testMaze) {
             this.generateMaze();
         }
@@ -66,6 +67,7 @@ export default class Maze {
     }
 
     buildBoard() {
+        if (this.debug) console.log("buildBoard");
         for (let i = 0; i < this.rowsLen; i++) {
             const boardRow = [];
             for (let j = 0; j < this.colsLen; j++) {
@@ -92,7 +94,8 @@ export default class Maze {
     }
 
     breadthFirstSearch(source, dest = null, findMax = false) {
-        let s = new Set();
+        if (this.debug) console.log("breadthFirstSearch");
+        let visited = new Set();
         let dist = new Map();
         let paths = new Map();
         for (let entry in this.graph) {
@@ -101,26 +104,26 @@ export default class Maze {
 
         dist[source] = 0;
         paths[source] = source;
-        let q = [];
-        q.push(source);
+        let queue = [];
+        queue.push(source);
         let found = false;
-        while (q.size != 0 || found) {
+        while (queue.size != 0 || found) {
 
-            let node = q.shift();
+            let node = queue.shift();
             if (node == undefined) break;
 
-            s.add(node);
+            visited.add(node);
             for (let n of this.graph[node]) {
-                if (!s.has(n) && dist[node] + 1 < dist[n]) {
+                if (!visited.has(n) && dist[node] + 1 < dist[n]) {
                     dist[n] = dist[node] + 1;
-                    paths[n]=node;
+                    paths[n] = node;
 
                     if (dest != null && n == dest) {
                         found = true;
                         break;
                     }
 
-                    q.push(n);
+                    queue.push(n);
                 }
             }
         }
@@ -150,6 +153,7 @@ export default class Maze {
     }
 
     findLongestEdgePath() {
+        if (this.debug) console.log("findLongestEdgePath");
         let lsp = null;
         for (let entry in this.graph) {
             const split = entry.split(" ");
@@ -160,7 +164,10 @@ export default class Maze {
 
             const [rPath_, max] = this.breadthFirstSearch(entry, null, true);
             if (lsp == null) lsp = max;
-            if (lsp[1] < max[1]) lsp = max;
+            if (lsp[1] < max[1]) {
+                lsp = max;
+            }
+            // console.log("lsp", lsp[0], lsp[1], lsp[2]);
         }
         console.log("lsp", lsp);
         const [rPath, max] = this.breadthFirstSearch(lsp[2], lsp[0]);
@@ -169,6 +176,7 @@ export default class Maze {
     }
 
     findGroups() {
+        if (this.debug) console.log("findGroups");
         let graphGroups = [];
         let globalVisited = new Set();
         for (let key in this.graph) {
@@ -195,7 +203,7 @@ export default class Maze {
     }
 
     generateMaze() {
-
+        if (this.debug) console.log("generateMaze");
         for (let i = 0; i < this.rowsLen; i++) {
             for (let j = 0; j < this.colsLen; j++) {
                 const key = `${i} ${j}`;
@@ -258,13 +266,19 @@ export default class Maze {
 
         let graphGroups = this.findGroups();
 
-        let largestGroup = graphGroups.shift();
-        let largestGroupSize = largestGroup.size;
-        const maxIteration = graphGroups.size;
-        let iteration = 0;
-        while (largestGroupSize < this.maxMazeSize || iteration >= maxIteration) {
-            for (let set of graphGroups) {
-                for (const entry of largestGroup) {
+        if (this.debug) console.log("connect large groups");
+        let largestGroup = graphGroups[0];
+        while (largestGroup.size < this.maxMazeSize) {
+            let sourceGroup = graphGroups[1];
+            if (this.debug) console.log(`connect large groups largestGroup ${sourceGroup.size}`);
+            let sourceGroupSize = sourceGroup.size;
+            let iteration = 0;
+            if (this.debug) console.log(`this.maxMazeSize ${this.maxMazeSize}`);
+            if (this.debug) console.log(`connect large groups iteration ${iteration}`);
+            if (this.debug) console.log(`sourceGroupSize ${sourceGroupSize}`);
+            for (let tempGroup of graphGroups) {
+                if (tempGroup === sourceGroup) continue;
+                for (const entry of sourceGroup) {
                     const split = entry.split(" ");
                     const row = Number.parseInt(split[0]);
                     const col = Number.parseInt(split[1]);
@@ -274,28 +288,26 @@ export default class Maze {
                     const rightKey = `${row} ${col + 1}`;
                     const leftKey = `${row} ${col - 1}`;
 
-                    if (this.addAdjacentNode(set, entry, upKey)) {
-                        largestGroupSize += set.size;
+                    if (this.addAdjacentNode(tempGroup, entry, upKey)) {
+                        graphGroups = this.findGroups();
                         break;
                     }
-                    if (this.addAdjacentNode(set, entry, downKey)) {
-                        largestGroupSize += set.size;
+                    if (this.addAdjacentNode(tempGroup, entry, downKey)) {
+                        graphGroups = this.findGroups();
                         break;
                     }
-                    if (this.addAdjacentNode(set, entry, rightKey)) {
-                        largestGroupSize += set.size;
+                    if (this.addAdjacentNode(tempGroup, entry, rightKey)) {
+                        graphGroups = this.findGroups();
                         break;
                     }
-                    if (this.addAdjacentNode(set, entry, leftKey)) {
-                        largestGroupSize += set.size;
+                    if (this.addAdjacentNode(tempGroup, entry, leftKey)) {
+                        graphGroups = this.findGroups();
                         break;
                     }
                 }
-
-                if (largestGroupSize < this.maxMazeSize) break;
-
+                largestGroup = graphGroups[0];
+                iteration += 1;
             }
-            iteration += 1;
         }
     }
 
