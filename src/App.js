@@ -13,7 +13,7 @@ let offPath = false;
 let lastSetBlink = null;
 let winState = false;
 function Square({ borders, mapKey }) {
-  const [value, setValue] = useState("#fff");
+  // const [value, setValue] = useState("#fff");
   const [color, setColor] = useState(null);
   const [blink, setBlink] = useState("");
   // const { lastSquare, setLastSquare } = useContext(UserContext);
@@ -26,7 +26,7 @@ function Square({ borders, mapKey }) {
 
     if (squaresq.length == 0) {
       lastSetBlink = setBlink;
-      setValue('X');
+      // setValue('X');
       setColor("#e9cbc5");
       setBlink("blink");
       squaresq.push([mapKey, setColor]);
@@ -42,7 +42,7 @@ function Square({ borders, mapKey }) {
       return;
     }
     offPath = false;
-    setValue('X');
+    // setValue('X');
     setColor("#e9cbc5");
     lastSetBlink("");
     setBlink("blink");
@@ -96,7 +96,7 @@ function Square({ borders, mapKey }) {
   }
 
   useEffect(() => {
-    setValue("");
+    // setValue("");
     setColor("#fff");
     // if (borders.inPath) {
     //   setColor("#cff8f8");
@@ -104,7 +104,7 @@ function Square({ borders, mapKey }) {
 
     if (maze.rPath[2] == mapKey) {
       lastSetBlink = setBlink;
-      setValue('X');
+      // setValue('X');
       setColor("#e9cbc5");
       setBlink("blink");
       squaresq.push([mapKey, setColor]);
@@ -117,7 +117,7 @@ function Square({ borders, mapKey }) {
     const handleLoad = () => {
       console.log('Page has fully loaded');
       // Perform actions after the page has fully loaded
-      setValue("");
+      // setValue("");
     };
 
     window.addEventListener('load', handleLoad);
@@ -144,7 +144,7 @@ function Square({ borders, mapKey }) {
         }}
       >
         {/* {borders.inPath ? "X" : ""} */}
-        {value}
+        {/* {value} */}
 
       </div>
     </>
