@@ -57,7 +57,7 @@ body {
 }
 
 .square {
-  background: #fff;
+  background: #a8e4b0;
   border: 1px solid #999;
   float: left;
   font-size: 24px;
@@ -90,4 +90,14 @@ body {
 
 .game-info {
   margin-left: 20px;
+}
+
+.blink {
+  animation: blinker 1s step-start infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: .3;
+  }
 }

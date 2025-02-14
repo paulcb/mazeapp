@@ -27,6 +27,7 @@ export default class Maze {
         this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * .68);
         this.board = [];
         this.graph = new Map();
+        this.graphGroups = null;
         this.rPath = null;
         this.debug = true;
         if (!testMaze) {
@@ -45,17 +46,18 @@ export default class Maze {
         this.buildBoard();
     }
 
-    neighbors(node) {
-        const split = node.split(" ");
-        const row = Number.parseInt(split[0]);
-        const col = Number.parseInt(split[1]);
+    // neighbors(node) {
+    //     const split = node.split(" ");
+    //     const row = Number.parseInt(split[0]);
+    //     const col = Number.parseInt(split[1]);
+    //     // if (!((row - 1 < 0) || (row + 1 >= this.rowsLen) || (col + 1 >= this.colsLen) || (col - 1 < 0))) continue;
 
-        const upKey = `${row - 1} ${col}`;
-        const downKey = `${row + 1} ${col}`;
-        const rightKey = `${row} ${col + 1}`;
-        const leftKey = `${row} ${col - 1}`;
-        return { up: upKey, down: downKey, right: rightKey, left: leftKey }
-    }
+    //     const upKey = `${row - 1} ${col}`;
+    //     const downKey = `${row + 1} ${col}`;
+    //     const rightKey = `${row} ${col + 1}`;
+    //     const leftKey = `${row} ${col - 1}`;
+    //     return { up: upKey, down: downKey, right: rightKey, left: leftKey }
+    // }
 
     addAdjacentNode(set, key1, key2) {
         if (set.has(key2)) {
@@ -171,7 +173,7 @@ export default class Maze {
         }
         console.log("lsp", lsp);
         const [rPath, max] = this.breadthFirstSearch(lsp[2], lsp[0]);
-        this.rPath = [rPath, max];
+        this.rPath = [rPath, max, lsp[2], lsp[0]];
 
     }
 
@@ -309,6 +311,7 @@ export default class Maze {
                 iteration += 1;
             }
         }
+        this.graphGroups = graphGroups;
     }
 
 }
