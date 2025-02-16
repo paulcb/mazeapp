@@ -22,8 +22,8 @@ function compareNumbers(a, b) {
 export default class Maze {
     constructor(testMaze) {
         this.edgeRage = 0.5;
-        this.rowsLen = 15;
-        this.colsLen = 10;
+        this.rowsLen = 5;
+        this.colsLen = 5;
         this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * .68);
         this.board = [];
         this.graph = new Map();
