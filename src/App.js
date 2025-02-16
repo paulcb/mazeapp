@@ -10,6 +10,9 @@ const pathColor = "#e9cbc5";
 const winColor = "#a8e4b0";
 const blinkClass = "blink";
 
+let lastMapKey = null;
+let lastElement = null;
+
 function Square({ borders, mapKey }) {
   const [color, setColor] = useState(null);
   const [blink, setBlink] = useState("");
@@ -48,13 +51,17 @@ function Square({ borders, mapKey }) {
   );
 }
 
-let lastMapKey = null;
-let lastElement = null;
-
 function squareEvent(element) {
+  if (lastMapKey == null) {
+    if(element.id != maze.maxPath.source) return;
+    lastMapKey = element.id;
+    lastElement = element;
+    path.set(lastMapKey, lastElement);
+    return;
+  }
   const mapKey = element.id;
 
-  if(mapKey == lastMapKey) return;
+  if (mapKey == lastMapKey) return;
 
   if (winState) return;
 
@@ -62,16 +69,15 @@ function squareEvent(element) {
     return;
   }
 
-  if (lastMapKey != null && lastElement != null) {
-    console.log("lastMapKey", lastMapKey);
-    if (lastMapKey != null) {
-      const node = maze.graph[lastMapKey];
-      if (!node.has(mapKey)) {
-        return;
-      }
+  if (lastMapKey != null) {
+    const node = maze.graph[lastMapKey];
+    if (!node.has(mapKey)) {
+      return;
     }
-    lastElement.className = "square";
   }
+
+  lastElement.className = "square";
+
   element.style.backgroundColor = pathColor;
   element.className = `square ${blinkClass}`;
   path.set(mapKey, element);
@@ -102,7 +108,7 @@ export default function Board() {
     squareEvent(element);
   }
 
-  function onMouseMove(event){
+  function onMouseMove(event) {
     if (event.target.className.slice(0, 6) != 'square') return;
     squareEvent(event.target);
   }
@@ -122,6 +128,7 @@ export default function Board() {
             {row.map((borders, j) => <Square key={borders.key} borders={borders} mapKey={`${i} ${j}`} />)}
           </div>
         ))}
+        a maze game (v1.2)
       </div>
     </>
   );
