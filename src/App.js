@@ -6,7 +6,6 @@ import { testMaze } from './maze-test.js';
 const maze = new Maze(testMaze);
 let path = new Map();
 let winState = false;
-
 const pathColor = "#e9cbc5";
 const winColor = "#a8e4b0";
 const blinkClass = "blink";
@@ -18,12 +17,12 @@ function Square({ borders, mapKey }) {
   useEffect(() => {
     setColor("#fff");
 
-    if (maze.maxPath.source == mapKey) {
+    if (maze.maxPath.source == mapKey && !winState) {
       setColor(pathColor);
       setBlink(blinkClass);
     }
 
-    if (maze.maxPath.dest == mapKey) {
+    if (maze.maxPath.dest == mapKey && !winState) {
       setColor(pathColor);
     }
 
