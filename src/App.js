@@ -4,10 +4,7 @@ import Maze from './maze.js'
 import { testMaze } from './maze-test.js';
 
 const maze = new Maze(testMaze);
-let squaresq = [];
 let path = new Map();
-let offPath = false;
-let lastSetBlink = null;
 let winState = false;
 
 const pathColor = "#e9cbc5";
@@ -17,85 +14,25 @@ const blinkClass = "blink";
 function Square({ borders, mapKey }) {
   const [color, setColor] = useState(null);
   const [blink, setBlink] = useState("");
-  function onMouseEnter() {
-    if (winState) return;
-
-    if (!maze.graphGroups[0].has(mapKey)) {
-      return;
-    }
-
-    if (squaresq.length == 0) {
-      lastSetBlink = setBlink;
-      setColor(pathColor);
-      setBlink(blinkClass);
-      squaresq.push([mapKey, setColor]);
-      return;
-    }
-
-    const node = maze.graph[squaresq[squaresq.length - 1][0]];
-    if (!node.has(mapKey)) {
-      offPath = true;
-      return;
-    }
-    offPath = false;
-    setColor(pathColor);
-    lastSetBlink("");
-    setBlink(blinkClass);
-
-    if (mapKey == maze.rPath[3]) {
-      winState = true;
-      console.log("Win!");
-      console.log("attr", path);
-      for (let attr of path) {
-        console.log("attr", attr);
-        attr[1][1](blinkClass);
-        attr[1][0](winColor);
-        lastSetBlink("");
-        setColor(winColor);
-        setBlink(blinkClass);
-      }
-    }
-
-  }
-
-  function onMouseLeave() {
-    if (winState) return;
-    if (offPath) return;
-
-    if (!maze.graphGroups[0].has(mapKey)) {
-      return;
-    }
-    setColor(pathColor);
-    squaresq.push([mapKey, setColor]);
-    path.set(mapKey, [setColor, setBlink]);
-    if (squaresq.length > 10) squaresq.shift();
-    lastSetBlink = setBlink;
-
-    offPath = false;
-  }
 
   useEffect(() => {
     setColor("#fff");
 
-    if (maze.rPath[2] == mapKey) {
-      lastSetBlink = setBlink;
+    if (maze.rPath[1][0] == mapKey) {
       setColor(pathColor);
       setBlink(blinkClass);
-      squaresq.push([mapKey, setColor]);
-      path.set(mapKey, [setColor, setBlink])
     }
 
-    if (maze.rPath[3] == mapKey) {
+    if (maze.rPath[1][1] == mapKey) {
       setColor(pathColor);
     }
+
   }, []);
   return (
     <>
       <div
         id={`${mapKey}`}
         className={`square ${blink}`}
-        // onMouseEnter={onMouseEnter}
-        // onMouseLeave={onMouseLeave}
         style={{
           borderTop: `${borders.up}px solid #999`,
           borderBottom: `${borders.down}px solid #999`,
@@ -116,7 +53,6 @@ let lastMapKey = null;
 let lastElement = null;
 
 function squareEvent(element) {
-  // console.log("squareEvent", element.id);
   const mapKey = element.id;
 
   if(mapKey == lastMapKey) return;
@@ -141,7 +77,7 @@ function squareEvent(element) {
   element.className = `square ${blinkClass}`;
   path.set(mapKey, element);
 
-  if (mapKey == maze.rPath[3]) {
+  if (mapKey == maze.rPath[1][1]) {
     winState = true;
     console.log("Win!");
     for (let [key, value] of path) {

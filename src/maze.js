@@ -131,10 +131,10 @@ export default class Maze {
         }
         let max = null;
         if (findMax) {
-            for (let d in dist) {
-                if (dist[d] == Infinity) continue;
-                if (max == null) max = [d, dist[d], source];
-                if (dist[d] > max[1]) max = [d, dist[d], source];
+            for (let dest in dist) {
+                if (dist[dest] == Infinity) continue;
+                if (max == null) max = [source, dest, dist[dest]];
+                if (dist[dest] > max[2]) max = [source, dest, dist[dest]];
             }
         }
         let rPath = new Map();
@@ -150,7 +150,6 @@ export default class Maze {
                 rPath.set(save, p);
             }
         }
-
         return [rPath, max]
     }
 
@@ -164,16 +163,16 @@ export default class Maze {
 
             if (!((row - 1 < 0) || (row + 1 >= this.rowsLen) || (col + 1 >= this.colsLen) || (col - 1 < 0))) continue;
 
-            const [rPath_, max] = this.breadthFirstSearch(entry, null, true);
+            const [rPath, max] = this.breadthFirstSearch(entry, null, true);
             if (lsp == null) lsp = max;
-            if (lsp[1] < max[1]) {
+            if (lsp[2] < max[2]) {
                 lsp = max;
             }
             // console.log("lsp", lsp[0], lsp[1], lsp[2]);
         }
         console.log("lsp", lsp);
-        const [rPath, max] = this.breadthFirstSearch(lsp[2], lsp[0]);
-        this.rPath = [rPath, max, lsp[2], lsp[0]];
+        const [rPath, max] = this.breadthFirstSearch(lsp[0], lsp[1]);
+        this.rPath = [rPath, lsp];
 
     }
 
