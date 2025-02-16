@@ -18,12 +18,12 @@ function Square({ borders, mapKey }) {
   useEffect(() => {
     setColor("#fff");
 
-    if (maze.rPath[1][0] == mapKey) {
+    if (maze.maxPath.source == mapKey) {
       setColor(pathColor);
       setBlink(blinkClass);
     }
 
-    if (maze.rPath[1][1] == mapKey) {
+    if (maze.maxPath.dest == mapKey) {
       setColor(pathColor);
     }
 
@@ -77,7 +77,7 @@ function squareEvent(element) {
   element.className = `square ${blinkClass}`;
   path.set(mapKey, element);
 
-  if (mapKey == maze.rPath[1][1]) {
+  if (mapKey == maze.maxPath.dest) {
     winState = true;
     console.log("Win!");
     for (let [key, value] of path) {

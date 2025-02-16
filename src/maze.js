@@ -28,7 +28,7 @@ export default class Maze {
         this.board = [];
         this.graph = new Map();
         this.graphGroups = null;
-        this.rPath = null;
+        this.maxPath = null;
         this.debug = true;
         if (!testMaze) {
             this.generateMaze();
@@ -78,9 +78,8 @@ export default class Maze {
                 const downKey = `${i + 1} ${j}`;
                 const rightKey = `${i} ${j + 1}`;
                 const leftKey = `${i} ${j - 1}`;
-                // console.log(this.rPath);
-                // console.log("key", key, this.rPath[0].has(key));
-                const inPath = this.rPath[0].has(key);
+
+                const inPath = this.maxPath.path.has(key);
                 let borders = {
                     up: this.graph[key].has(upKey) ? 0 : 1,
                     down: this.graph[key].has(downKey) ? 0 : 1,
@@ -129,28 +128,39 @@ export default class Maze {
                 }
             }
         }
-        let max = null;
+        let maxPath = null;
         if (findMax) {
             for (let dest in dist) {
                 if (dist[dest] == Infinity) continue;
-                if (max == null) max = [source, dest, dist[dest]];
-                if (dist[dest] > max[2]) max = [source, dest, dist[dest]];
+                if (maxPath == null) {
+                    maxPath = {
+                        path: new Map(), source: source, dest: dest, distance: dist[dest]
+                    };
+                }
+
+                if (dist[dest] > maxPath.distance) {
+                    maxPath = {
+                        path: new Map(), source: source, dest: dest, distance: dist[dest]
+                    };
+                }
+
             }
         }
-        let rPath = new Map();
         if (found) {
-
+            maxPath = {
+                path: new Map(), source: source, dest: dest, distance: dist[dest]
+            };
             let p = paths[dest];
-            rPath.set(dest, p);
+            maxPath.path.set(dest, p);
             // console.log("path", p);
             while (p != source) {
                 // console.log("path", p);
                 let save = p;
                 p = paths[p];
-                rPath.set(save, p);
+                maxPath.path.set(save, p);
             }
         }
-        return [rPath, max]
+        return maxPath;
     }
 
     findLongestEdgePath() {
@@ -163,16 +173,16 @@ export default class Maze {
 
             if (!((row - 1 < 0) || (row + 1 >= this.rowsLen) || (col + 1 >= this.colsLen) || (col - 1 < 0))) continue;
 
-            const [rPath, max] = this.breadthFirstSearch(entry, null, true);
-            if (lsp == null) lsp = max;
-            if (lsp[2] < max[2]) {
-                lsp = max;
+            const maxPath = this.breadthFirstSearch(entry, null, true);
+            if (lsp == null) lsp = maxPath;
+            if (lsp.distance < maxPath.distance) {
+                lsp = maxPath;
             }
             // console.log("lsp", lsp[0], lsp[1], lsp[2]);
         }
         console.log("lsp", lsp);
-        const [rPath, max] = this.breadthFirstSearch(lsp[0], lsp[1]);
-        this.rPath = [rPath, lsp];
+        const maxPath = this.breadthFirstSearch(lsp.source, lsp.dest);
+        this.maxPath = maxPath;
 
     }
 
