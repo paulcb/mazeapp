@@ -20,28 +20,51 @@ function compareNumbers(a, b) {
 }
 
 export default class Maze {
-    constructor(testMaze) {
-        this.edgeRage = 0.5;
-        this.rowsLen = 12;
-        this.colsLen = 6;
-        this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * .68);
+    constructor(inputMaze, rowsLen, colsLen, edgeRate = .5, groupRate = .68, isInit = false, debug = false) {
         this.board = [];
         this.graph = new Map();
         this.graphGroups = null;
         this.maxPath = null;
-        this.debug = true;
-        if (!testMaze) {
+        this.debug = debug;
+
+        this.inputMaze = inputMaze;
+        if (inputMaze) {
+            this.rowsLen = inputMaze.rowsLen;
+            this.colsLen = inputMaze.colsLen;
+            this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * this.groupRate);
+            this.init();
+            return;
+        }
+        this.edgeRate = edgeRate;
+        this.rowsLen = rowsLen;
+        this.colsLen = colsLen;
+        this.groupRate = groupRate;
+
+        this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * this.groupRate);
+
+        if (isInit) {
+            this.init();
+        }
+    }
+
+    init() {
+        if (!this.inputMaze) {
             this.generateMaze();
         }
         else {
-            for (let entry of testMaze) {
+
+            for (let entry of this.inputMaze.nodes) {
                 this.graph[entry[0]] = new Set();
                 for (let edge of entry[1]) {
                     this.graph[entry[0]].add(edge);
                 }
             }
+            this.findGroups();
+            let graphGroups = this.findGroups();
+            this.graphGroups = graphGroups;
 
         }
+        
         this.findLongestEdgePath();
         this.buildBoard();
     }
@@ -225,10 +248,10 @@ export default class Maze {
 
                 let nodes = new Set();
                 let borders = {
-                    up: Math.random() > this.edgeRage ? 1 : 0,
-                    down: Math.random() > this.edgeRage ? 1 : 0,
-                    left: Math.random() > this.edgeRage ? 1 : 0,
-                    right: Math.random() > this.edgeRage ? 1 : 0,
+                    up: Math.random() > this.edgeRate ? 1 : 0,
+                    down: Math.random() > this.edgeRate ? 1 : 0,
+                    left: Math.random() > this.edgeRate ? 1 : 0,
+                    right: Math.random() > this.edgeRate ? 1 : 0,
                     key: key
                 };
 
@@ -320,7 +343,17 @@ export default class Maze {
                 iteration += 1;
             }
         }
+
         this.graphGroups = graphGroups;
+        const data = [];
+        data.push([this.rowsLen, this.colsLen]);
+        const nodes = [];
+        for (let key in this.graph) {
+            nodes.push([key, [...this.graph[key].values()]]);
+            
+        }
+        data.push(nodes);
+        console.log("data", JSON.stringify(data));
     }
 
 }
