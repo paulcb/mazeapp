@@ -2,22 +2,11 @@ import { AppData } from "./globals";
 import { useState } from 'react';
 import { useEffect } from "react";
 
-export default function Square({ borders, mapKey }) {
-    const [color, setColor] = useState(null);
-    const [blink, setBlink] = useState("");
-
+export default function Square({ borders, mapKey, blink, color }) {
     useEffect(() => {
-        setColor("#fff");
 
-        if (AppData.data.maze.maxPath.source == mapKey && !AppData.data.winState) {
-            setColor(AppData.constants.pathColor);
-            setBlink(AppData.constants.blinkClass);
-        }
-
-        if (AppData.data.maze.maxPath.dest == mapKey && !AppData.data.winState) {
-            setColor(AppData.constants.pathColor);
-        }
     }, []);
+    // console.log("Square render", mapKey, color, blink);
     return (
         <>
             <div

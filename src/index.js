@@ -1,5 +1,5 @@
 import { AppData } from "./globals";
-import { testMaze12x6, testMaze20x20 } from "./maze-test.js";
+import { testMaze12x6, testMaze16x20 } from "./maze-test.js";
 import Maze from './maze.js'
 
 import React, { StrictMode } from "react";
@@ -8,7 +8,7 @@ import "./styles.css";
 
 import App from "./App";
 
-const loadData = false;
+const loadData = true;
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 if (isMobile) {
   if (loadData) {
@@ -20,10 +20,10 @@ if (isMobile) {
   }
 } else {
   if (loadData) {
-    AppData.data.maze = new Maze(testMaze20x20);
+    AppData.data.maze = new Maze(testMaze16x20);
   }
   else {
-    AppData.data.maze = new Maze(null, 20, 20);
+    AppData.data.maze = new Maze(null, 16, 20);
     AppData.data.maze.init();
   }
 }

@@ -56,11 +56,23 @@ body {
   padding: 0;
 }
 
+.controls {
+  background: #a8e4b0;
+  float: left;
+  /* border: 1px solid #999; */
+  /* font-size: 16px; */
+  /* font-weight: bold; */
+  /* line-height: 34px; */
+  margin: 10px;
+  /* padding: 2; */
+  /* text-align: center; */
+}
+
 .square {
   background: #a8e4b0;
   border: 1px solid #999;
   float: left;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: bold;
   line-height: 34px;
   height: 42px;
@@ -77,6 +89,7 @@ body {
 .board-row:after {
   clear: both;
   content: '';
+  float: left;
   /* display: table; */
 }
 

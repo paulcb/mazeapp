@@ -1,8 +1,9 @@
 import { AppData } from "./globals";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Square from './Square.js';
 
-export default function Board() {
+export default function Board({ resetUpdate }) {
+    const [reset, setReset] = useState(0);
 
     function squareEvent(element) {
         if (AppData.data.lastMapKey == null) {
@@ -48,7 +49,7 @@ export default function Board() {
         AppData.data.lastElement = element;
     }
 
-    function onTouchStart(event) { console.log("onTouchStart", event.touches); }
+    // function onTouchStart(event) { console.log("onTouchStart", event.touches); }
 
     function onTouchMove(event) {
         const x = event.touches[0].clientX;
@@ -64,26 +65,57 @@ export default function Board() {
         squareEvent(event.target);
     }
 
-    function onTouchEnd(event) { console.log("onTouchEnd", event.touches); }
+    // function onTouchEnd(event) { console.log("onTouchEnd", event.touches); }
 
     useEffect(() => {
+        // console.log("reset", reset);
+        setReset(resetUpdate);
     }, []);
+
+    function blink(mapKey) {
+        if (AppData.data.maze.maxPath.source == mapKey && !AppData.data.winState) {
+            return AppData.constants.blinkClass;
+        }
+        return "";
+
+    }
+
+    function color(mapKey) {
+        if (AppData.data.maze.maxPath.dest == mapKey && !AppData.data.winState) {
+            return AppData.constants.pathColor;
+        }
+
+        if (AppData.data.maze.maxPath.source == mapKey && !AppData.data.winState) {
+            return AppData.constants.pathColor;
+        }
+
+        return "#fff";
+    }
 
     return (
         <>
-            <div style={{ touchAction: 'none', position: 'fixed' }}
-                onTouchStart={onTouchStart}
+            <div
+                // onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
+                // onTouchEnd={onTouchEnd}
                 onMouseMove={onMouseMove}
             >
                 {AppData.data.maze.board.map((row, i) => (
                     <div key={i} className="board-row">
-                        {row.map((borders, j) => <Square key={borders.key} borders={borders} mapKey={`${i} ${j}`} />)}
+                        {row.map((borders, j) =>
+                            <Square
+                                key={borders.key}
+                                borders={borders}
+                                mapKey={`${i} ${j}`}
+                                blink={blink(borders.key)}
+                                color={color(borders.key)}
+                            />
+                        )
+                        }
                     </div>
                 ))}
-                a maze game (v1.2)
             </div>
+
         </>
     );
 }

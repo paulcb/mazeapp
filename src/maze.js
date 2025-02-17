@@ -201,9 +201,7 @@ export default class Maze {
             if (lsp.distance < maxPath.distance) {
                 lsp = maxPath;
             }
-            // console.log("lsp", lsp[0], lsp[1], lsp[2]);
         }
-        console.log("lsp", lsp);
         const maxPath = this.breadthFirstSearch(lsp.source, lsp.dest);
         this.maxPath = maxPath;
 
@@ -353,7 +351,7 @@ export default class Maze {
             
         }
         data.push(nodes);
-        console.log("data", JSON.stringify(data));
+        // console.log("data", JSON.stringify(data));
     }
 
 }
