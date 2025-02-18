@@ -1,7 +1,9 @@
+import Maze from "./maze";
+
 export const AppData = {
     data: {
 
-        maze: null,
+        maze: new Maze(null, 5, 5),
         path: new Map(),
         winState: false,
         lastMapKey: null,

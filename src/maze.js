@@ -29,8 +29,8 @@ export default class Maze {
 
         this.inputMaze = inputMaze;
         if (inputMaze) {
-            this.rowsLen = inputMaze.rowsLen;
-            this.colsLen = inputMaze.colsLen;
+            this.rowsLen = inputMaze.dims.rowsLen;
+            this.colsLen = inputMaze.dims.colsLen;
             this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * this.groupRate);
             this.init();
             return;
@@ -343,15 +343,14 @@ export default class Maze {
         }
 
         this.graphGroups = graphGroups;
-        const data = [];
-        data.push([this.rowsLen, this.colsLen]);
+        const mazeData = {data: {dims:{rowsLen: this.rowsLen, colsLen: this.colsLen}, nodes: null}};
         const nodes = [];
         for (let key in this.graph) {
             nodes.push([key, [...this.graph[key].values()]]);
             
         }
-        data.push(nodes);
-        // console.log("data", JSON.stringify(data));
+        mazeData.data.nodes = nodes;
+        this.mazeJsonOutput = mazeData;
     }
 
 }
