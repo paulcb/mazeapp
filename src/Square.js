@@ -3,10 +3,7 @@ import { useState } from 'react';
 import { useEffect } from "react";
 
 export default function Square({ borders, mapKey, blink, color }) {
-    useEffect(() => {
-
-    }, []);
-    // console.log("Square render", mapKey, color, blink);
+    // console.log("render Square");
     return (
         <>
             <div

@@ -1,13 +1,13 @@
-import Maze from "./maze";
 
 export const AppData = {
     data: {
 
-        maze: new Maze(null, 5, 5),
+        maze: null,
         path: new Map(),
         winState: false,
         lastMapKey: null,
         lastElement: null,
+        mazes: null,
     },
     constants: {
         pathColor: "#e9cbc5",

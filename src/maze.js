@@ -20,12 +20,13 @@ function compareNumbers(a, b) {
 }
 
 export default class Maze {
-    constructor(inputMaze, rowsLen, colsLen, edgeRate = .5, groupRate = .68, isInit = false, debug = false) {
+    constructor(inputMaze, rowsLen = 16, colsLen = 6, edgeRate = .5, groupRate = .68, isInit = false, debug = false) {
         this.board = [];
         this.graph = new Map();
         this.graphGroups = null;
         this.maxPath = null;
         this.debug = debug;
+        this.groupRate = groupRate;
 
         this.inputMaze = inputMaze;
         if (inputMaze) {
@@ -38,7 +39,6 @@ export default class Maze {
         this.edgeRate = edgeRate;
         this.rowsLen = rowsLen;
         this.colsLen = colsLen;
-        this.groupRate = groupRate;
 
         this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * this.groupRate);
 
@@ -64,7 +64,7 @@ export default class Maze {
             this.graphGroups = graphGroups;
 
         }
-        
+
         this.findLongestEdgePath();
         this.buildBoard();
     }
@@ -343,11 +343,11 @@ export default class Maze {
         }
 
         this.graphGroups = graphGroups;
-        const mazeData = {data: {dims:{rowsLen: this.rowsLen, colsLen: this.colsLen}, nodes: null}};
+        const mazeData = { data: { dims: { rowsLen: this.rowsLen, colsLen: this.colsLen }, nodes: null } };
         const nodes = [];
         for (let key in this.graph) {
             nodes.push([key, [...this.graph[key].values()]]);
-            
+
         }
         mazeData.data.nodes = nodes;
         this.mazeJsonOutput = mazeData;
