@@ -120,7 +120,7 @@ export default function App() {
     if (isMobile) {
       AppData.data.maze = new Maze(maze.mobile.data);
     } else {
-      AppData.data.maze = new Maze(maze.mobile.data);
+      AppData.data.maze = new Maze(maze.desktop.data);
     }
     setSelected(1);
 
