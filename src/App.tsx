@@ -35,7 +35,7 @@ function App() {
   const [error, setError] = useState<any>(null);
   const [reset, setReset] = useState(0);
   const [selectedValue, setSelectedValue] = useState('');
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
   const [mazesDates, setMazesDates] = useState<string[]>([]);
 
   const fetchData = async () => {
@@ -94,7 +94,7 @@ function App() {
   useEffect(() => {
     if (data && loading) {
       let maze = null;
-      let date: Date|null = new Date();
+      let date: Date | null = new Date();
       let dateKey = `${date.toISOString().split('T')[0]}`;
 
       if (!data.has(dateKey)) {
@@ -130,8 +130,14 @@ function App() {
   }
 
   function onChange(event: ChangeEvent<HTMLSelectElement>) {
-    if(data == null) return;
-    const maze = data.get(event.target.value);
+    if (event == null) return;
+    setSelected(event.target.value);
+  }
+
+  useEffect(() => {
+    if (selected == null || data == null) return;
+
+    const maze = data.get(selected);
     AppData.data.winState = false;
     for (const [, value] of AppData.data.path) {
       value.style.backgroundColor = "#fff";
@@ -145,18 +151,15 @@ function App() {
     } else {
       AppData.data.maze = new Maze(maze.desktop.data);
     }
-    setSelected(1);
-
-  }
-
-  useEffect(() => { setSelected(0); }, [selected]);
+    setSelected(null);
+  }, [selected, data]);
 
   if (loading) {
     return (<>Loading...</>);
   }
   return (
     <>
-      <Board/>
+      <Board />
       {/* <Controls></Controls> */}
       <div style={{ float: "left" }}>
         <button className="controls" onClick={onClick}> New </button>
