@@ -1,18 +1,18 @@
 
-// class Boarders {
-//     up: number;
-//     down: number;
-//     left: number;
-//     right: number;
-//     key: null;
-//     constructor(up = 0, down = 0, left = 0, right = 0, key = null) {
-//         this.up = up;
-//         this.down = down;
-//         this.left = left;
-//         this.right = right;
-//         this.key = key;
-//     }
-// }
+export class Boarders {
+    up: number;
+    down: number;
+    left: number;
+    right: number;
+    key: null;
+    constructor(up = 0, down = 0, left = 0, right = 0, key = null) {
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+        this.key = key;
+    }
+}
 
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);
@@ -28,7 +28,7 @@ export default class Maze {
     board: any[];
     graph: Map<any, any>;
     graphGroups: Set<string>[] | null;
-    maxPath: null;
+    maxPath: any | null;
     debug: boolean;
     groupRate: number;
     inputMaze: any;
@@ -36,9 +36,13 @@ export default class Maze {
     colsLen: any;
     maxMazeSize: number;
     edgeRate: number;
-    edgeRate2: number;
     mazeJsonOutput: any;
-    constructor(inputMaze: any, rowsLen = 16, colsLen = 6, edgeRate = .5, groupRate = .68, isInit = false, debug = false) {
+    constructor(inputMaze: any,
+        rowsLen: number = 16,
+        colsLen: number = 6,
+        edgeRate: number = .5,
+        groupRate: number = .68, isInit: boolean = false, debug: boolean = false) {
+
         this.board = [];
         this.graph = new Map();
         this.graphGroups = null;
@@ -46,7 +50,12 @@ export default class Maze {
         this.debug = debug;
         this.groupRate = groupRate;
 
+        this.edgeRate = edgeRate;
+        this.rowsLen = rowsLen;
+        this.colsLen = colsLen;
+
         this.inputMaze = inputMaze;
+
         if (inputMaze) {
             this.rowsLen = inputMaze.dims.rowsLen;
             this.colsLen = inputMaze.dims.colsLen;
@@ -54,9 +63,7 @@ export default class Maze {
             this.init();
             return;
         }
-        this.edgeRate = edgeRate;
-        this.rowsLen = rowsLen;
-        this.colsLen = colsLen;
+
 
         this.maxMazeSize = Math.floor((this.colsLen * this.rowsLen) * this.groupRate);
 
@@ -111,6 +118,10 @@ export default class Maze {
 
     buildBoard() {
         if (this.debug) console.log("buildBoard");
+        if (this.maxPath == null) {
+            console.log("Error: max path is null");
+            return
+        }
         for (let i = 0; i < this.rowsLen; i++) {
             const boardRow: any[] = [];
             for (let j = 0; j < this.colsLen; j++) {
@@ -140,7 +151,7 @@ export default class Maze {
         let visited = new Set();
         let dist = new Map();
         let paths = new Map();
-        for (let entry in this.graph) {
+        for (let entry of this.graph.keys()) {
             dist.set(entry, Infinity);
         }
 
@@ -149,10 +160,10 @@ export default class Maze {
         let queue: any[] = [];
         queue.push(source);
         let found = false;
-        while (queue.length != 0 || found) {
+        while (queue.length !== 0 || found) {
 
             let node = queue.shift();
-            if (node == undefined) break;
+            if (node === undefined) break;
 
             visited.add(node);
             for (let n of this.graph.get(node)) {
@@ -160,7 +171,7 @@ export default class Maze {
                     dist.set(n, dist.get(node) + 1);
                     paths.set(n, node);
 
-                    if (dest != null && n == dest) {
+                    if (dest !== null && n === dest) {
                         found = true;
                         break;
                     }
@@ -171,9 +182,9 @@ export default class Maze {
         }
         let maxPath: any = null;
         if (findMax) {
-            for (let dest_i in dist) {
+            for (let dest_i of dist.keys()) {
 
-                if (dist.get(dest_i) == Infinity) continue;
+                if (dist.get(dest_i) === Infinity) continue;
                 if (maxPath == null) {
                     maxPath = {
                         path: new Map(), source: source, dest: dest_i, distance: dist.get(dest_i)
@@ -188,14 +199,14 @@ export default class Maze {
 
             }
         }
-        if (dest != null && found) {
+        if (dest !== null && found) {
             maxPath = {
                 path: new Map(), source: source, dest: dest, distance: dist.get(dest)
             };
             let p = paths.get(dest);
             maxPath.path.set(dest, p);
             // console.log("path", p);
-            while (p != source) {
+            while (p !== source) {
                 // console.log("path", p);
                 let save = p;
                 p = paths.get(p);
@@ -208,7 +219,7 @@ export default class Maze {
     findLongestEdgePath() {
         if (this.debug) console.log("findLongestEdgePath");
         let lsp = null;
-        for (let entry in this.graph) {
+        for (let entry of this.graph.keys()) {
             const split = entry.split(" ");
             const row = Number.parseInt(split[0]);
             const col = Number.parseInt(split[1]);
@@ -234,11 +245,11 @@ export default class Maze {
         if (this.debug) console.log("findGroups");
         let graphGroups: Set<string>[] = [];
         let globalVisited = new Set<string>();
-        for (let key in this.graph) {
+        for (let key of this.graph.keys()) {
             if (globalVisited.has(key)) continue;
             let visited = new Set<string>();
             let stack: string[] = [key];
-            while (stack.length != 0) {
+            while (stack.length !== 0) {
                 const node = stack.pop();
                 if (node === undefined) break;
                 if (!visited.has(node)) {
@@ -280,11 +291,11 @@ export default class Maze {
                 if (i - 1 < 0) {
                     borders.up = 1;
                 } else {
-                    if (borders.up == 1 && this.graph.get(upKey).has(key)) {
+                    if (borders.up === 1 && this.graph.get(upKey).has(key)) {
                         this.graph.get(upKey).delete(key);
                     }
 
-                    if (borders.up == 0 && !this.graph.get(upKey).has(key)) {
+                    if (borders.up === 0 && !this.graph.get(upKey).has(key)) {
                         this.graph.get(upKey).add(key);
                     }
                 }
@@ -300,20 +311,20 @@ export default class Maze {
                 if (j - 1 < 0) {
                     borders.left = 1;
                 } else {
-                    if (borders.left == 1 && this.graph.get(leftKey).has(key)) {
+                    if (borders.left === 1 && this.graph.get(leftKey).has(key)) {
                         this.graph.get(leftKey).delete(key);
                     }
 
-                    if (borders.left == 0 && !this.graph.get(leftKey).has(key)) {
+                    if (borders.left === 0 && !this.graph.get(leftKey).has(key)) {
                         this.graph.get(leftKey).add(key);
                     }
                 }
 
 
-                if (borders.up == 0) nodes.add(upKey);
-                if (borders.down == 0) nodes.add(downKey);
-                if (borders.right == 0) nodes.add(rightKey);
-                if (borders.left == 0) nodes.add(leftKey);
+                if (borders.up === 0) nodes.add(upKey);
+                if (borders.down === 0) nodes.add(downKey);
+                if (borders.right === 0) nodes.add(rightKey);
+                if (borders.left === 0) nodes.add(leftKey);
 
 
                 this.graph.set(key, nodes);
@@ -367,9 +378,9 @@ export default class Maze {
         }
 
         this.graphGroups = graphGroups;
-        const mazeData = { data: { dims: { rowsLen: this.rowsLen, colsLen: this.colsLen }, nodes: null } };
+        const mazeData: { data: any } = { data: { dims: { rowsLen: this.rowsLen, colsLen: this.colsLen }, nodes: null } };
         const nodes: any[] = [];
-        for (let key in this.graph) {
+        for (let key of this.graph.keys()) {
             nodes.push([key, [...this.graph.get(key).values()]]);
 
         }

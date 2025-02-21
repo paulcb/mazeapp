@@ -1,9 +1,5 @@
-import { AppData } from "./globals";
-import { useState } from 'react';
-import { useEffect } from "react";
 
-export default function Square({ borders, mapKey, blink, color }) {
-    // console.log("render Square");
+export default function Square({ borders, mapKey, blink, color }: { borders: any, mapKey: string, blink: string, color: string }) {
     return (
         <>
             <div

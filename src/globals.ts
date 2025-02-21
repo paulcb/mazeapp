@@ -1,5 +1,5 @@
 
-export const AppData = {
+export const AppData: { data: any, constants: any } = {
     data: {
 
         maze: null,

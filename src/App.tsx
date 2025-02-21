@@ -1,20 +1,42 @@
 import { AppData } from "./globals";
-import Maze from './maze.js'
 
-import React, { useEffect, useState } from 'react';
-// import { testMaze } from './maze-test.js';
-import Board from './Board.js';
+import React, { ChangeEvent, ChangeEventHandler, useEffect, useState } from 'react';
+// import logo from './logo.svg';
+import './App.css';
+import Board from './Board';
+import Maze from './maze'
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-export default function App() {
-  const [data, setData] = useState(null);
+// function App() {
+//   return (
+//     <div className="App">
+//       <header className="App-header">
+//         <img src={logo} className="App-logo" alt="logo" />
+//         <p>
+//           Edit <code>src/App.tsx</code> and save to reload.
+//         </p>
+//         <a
+//           className="App-link"
+//           href="https://reactjs.org"
+//           target="_blank"
+//           rel="noopener noreferrer"
+//         >
+//           Learn React
+//         </a>
+//       </header>
+//     </div>
+//   );
+// }
+
+function App() {
+  const [data, setData] = useState<Map<string, any> | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
   const [reset, setReset] = useState(0);
   const [selectedValue, setSelectedValue] = useState('');
   const [selected, setSelected] = useState(0);
-  const [mazesDates, setMazesDates] = useState([]);
+  const [mazesDates, setMazesDates] = useState<string[]>([]);
 
   const fetchData = async () => {
     try {
@@ -24,7 +46,7 @@ export default function App() {
       }
       const json = await response.json();
       let temp = new Map();
-      let tempMazesDates = [];
+      let tempMazesDates: string[] = [];
       tempMazesDates.push("Select");
       for (let d of json.mazes) {
         const date = new Date(d.date);
@@ -72,7 +94,7 @@ export default function App() {
   useEffect(() => {
     if (data && loading) {
       let maze = null;
-      let date = new Date();
+      let date: Date|null = new Date();
       let dateKey = `${date.toISOString().split('T')[0]}`;
 
       if (!data.has(dateKey)) {
@@ -107,7 +129,8 @@ export default function App() {
     setReset(1);
   }
 
-  function onChange(event) {
+  function onChange(event: ChangeEvent<HTMLSelectElement>) {
+    if(data == null) return;
     const maze = data.get(event.target.value);
     AppData.data.winState = false;
     for (let [key, value] of AppData.data.path) {
@@ -133,7 +156,7 @@ export default function App() {
   }
   return (
     <>
-      <Board reset={reset} loading={loading} selected={selected} />
+      <Board/>
       {/* <Controls></Controls> */}
       <div style={{ float: "left" }}>
         <button className="controls" onClick={onClick}> New </button>
@@ -149,3 +172,5 @@ export default function App() {
   );
 
 }
+
+export default App;
