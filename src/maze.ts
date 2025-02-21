@@ -78,14 +78,14 @@ export default class Maze {
         }
         else {
 
-            for (let entry of this.inputMaze.nodes) {
+            for (const entry of this.inputMaze.nodes) {
                 this.graph.set(entry[0], new Set<string>());
-                for (let edge of entry[1]) {
+                for (const edge of entry[1]) {
                     this.graph.get(entry[0]).add(edge);
                 }
             }
             this.findGroups();
-            let graphGroups = this.findGroups();
+            const graphGroups = this.findGroups();
             this.graphGroups = graphGroups;
 
         }
@@ -132,7 +132,7 @@ export default class Maze {
                 const leftKey = `${i} ${j - 1}`;
 
                 const inPath = this.maxPath.path.has(key);
-                let borders = {
+                const borders = {
                     up: this.graph.get(key).has(upKey) ? 0 : 1,
                     down: this.graph.get(key).has(downKey) ? 0 : 1,
                     left: this.graph.get(key).has(leftKey) ? 0 : 1,
@@ -148,25 +148,25 @@ export default class Maze {
 
     breadthFirstSearch(source: string, dest: string | null = null, findMax = false) {
         if (this.debug) console.log("breadthFirstSearch");
-        let visited = new Set();
-        let dist = new Map();
-        let paths = new Map();
-        for (let entry of this.graph.keys()) {
+        const visited = new Set();
+        const dist = new Map();
+        const paths = new Map();
+        for (const entry of this.graph.keys()) {
             dist.set(entry, Infinity);
         }
 
         dist.set(source, 0);
         paths.set(source, source);
-        let queue: any[] = [];
+        const queue: any[] = [];
         queue.push(source);
         let found = false;
         while (queue.length !== 0 || found) {
 
-            let node = queue.shift();
+            const node = queue.shift();
             if (node === undefined) break;
 
             visited.add(node);
-            for (let n of this.graph.get(node)) {
+            for (const n of this.graph.get(node)) {
                 if (!visited.has(n) && dist.get(node) + 1 < dist.get(n)) {
                     dist.set(n, dist.get(node) + 1);
                     paths.set(n, node);
@@ -182,7 +182,7 @@ export default class Maze {
         }
         let maxPath: any = null;
         if (findMax) {
-            for (let dest_i of dist.keys()) {
+            for (const dest_i of dist.keys()) {
 
                 if (dist.get(dest_i) === Infinity) continue;
                 if (maxPath == null) {
@@ -208,7 +208,7 @@ export default class Maze {
             // console.log("path", p);
             while (p !== source) {
                 // console.log("path", p);
-                let save = p;
+                const save = p;
                 p = paths.get(p);
                 maxPath.path.set(save, p);
             }
@@ -219,7 +219,7 @@ export default class Maze {
     findLongestEdgePath() {
         if (this.debug) console.log("findLongestEdgePath");
         let lsp = null;
-        for (let entry of this.graph.keys()) {
+        for (const entry of this.graph.keys()) {
             const split = entry.split(" ");
             const row = Number.parseInt(split[0]);
             const col = Number.parseInt(split[1]);
@@ -243,12 +243,12 @@ export default class Maze {
 
     findGroups() {
         if (this.debug) console.log("findGroups");
-        let graphGroups: Set<string>[] = [];
-        let globalVisited = new Set<string>();
-        for (let key of this.graph.keys()) {
+        const graphGroups: Set<string>[] = [];
+        const globalVisited = new Set<string>();
+        for (const key of this.graph.keys()) {
             if (globalVisited.has(key)) continue;
-            let visited = new Set<string>();
-            let stack: string[] = [key];
+            const visited = new Set<string>();
+            const stack: string[] = [key];
             while (stack.length !== 0) {
                 const node = stack.pop();
                 if (node === undefined) break;
@@ -279,8 +279,8 @@ export default class Maze {
                 const rightKey = `${i} ${j + 1}`;
                 const leftKey = `${i} ${j - 1}`;
 
-                let nodes = new Set();
-                let borders = {
+                const nodes = new Set();
+                const borders = {
                     up: Math.random() > this.edgeRate ? 1 : 0,
                     down: Math.random() > this.edgeRate ? 1 : 0,
                     left: Math.random() > this.edgeRate ? 1 : 0,
@@ -336,14 +336,14 @@ export default class Maze {
         if (this.debug) console.log("connect large groups");
         let largestGroup = graphGroups[0];
         while (largestGroup.size < this.maxMazeSize) {
-            let sourceGroup = graphGroups[1];
+            const sourceGroup = graphGroups[1];
             if (this.debug) console.log(`connect large groups largestGroup ${sourceGroup.size}`);
-            let sourceGroupSize = sourceGroup.size;
+            const sourceGroupSize = sourceGroup.size;
             let iteration = 0;
             if (this.debug) console.log(`this.maxMazeSize ${this.maxMazeSize}`);
             if (this.debug) console.log(`connect large groups iteration ${iteration}`);
             if (this.debug) console.log(`sourceGroupSize ${sourceGroupSize}`);
-            for (let tempGroup of graphGroups) {
+            for (const tempGroup of graphGroups) {
                 if (tempGroup === sourceGroup) continue;
                 for (const entry of sourceGroup) {
                     const split = entry.split(" ");
@@ -380,7 +380,7 @@ export default class Maze {
         this.graphGroups = graphGroups;
         const mazeData: { data: any } = { data: { dims: { rowsLen: this.rowsLen, colsLen: this.colsLen }, nodes: null } };
         const nodes: any[] = [];
-        for (let key of this.graph.keys()) {
+        for (const key of this.graph.keys()) {
             nodes.push([key, [...this.graph.get(key).values()]]);
 
         }

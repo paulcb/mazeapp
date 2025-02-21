@@ -1,6 +1,6 @@
 import { AppData } from "./globals";
 
-import React, { ChangeEvent, ChangeEventHandler, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import Board from './Board';
@@ -45,10 +45,10 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const json = await response.json();
-      let temp = new Map();
-      let tempMazesDates: string[] = [];
+      const temp = new Map();
+      const tempMazesDates: string[] = [];
       tempMazesDates.push("Select");
-      for (let d of json.mazes) {
+      for (const d of json.mazes) {
         const date = new Date(d.date);
         const dateKey = `${date.toISOString().split('T')[0]}`;
         tempMazesDates.push(dateKey);
@@ -64,7 +64,7 @@ function App() {
   useEffect(() => {
     if (reset) {
       AppData.data.winState = false;
-      for (let [key, value] of AppData.data.path) {
+      for (const [, value] of AppData.data.path) {
         value.style.backgroundColor = "#fff";
         value.className = `square`;
       }
@@ -99,7 +99,7 @@ function App() {
 
       if (!data.has(dateKey)) {
         date = null;
-        for (let [key, value] of data) {
+        for (const [key] of data) {
           if (date == null) {
             date = new Date(key);
             dateKey = key;
@@ -123,7 +123,7 @@ function App() {
 
       setLoading(false);
     }
-  }, [data]);
+  }, [data, loading]);
 
   function onClick() {
     setReset(1);
@@ -133,7 +133,7 @@ function App() {
     if(data == null) return;
     const maze = data.get(event.target.value);
     AppData.data.winState = false;
-    for (let [key, value] of AppData.data.path) {
+    for (const [, value] of AppData.data.path) {
       value.style.backgroundColor = "#fff";
       value.className = `square`;
     }

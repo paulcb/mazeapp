@@ -1,5 +1,5 @@
 import { AppData } from "./globals";
-import {  MouseEvent, TouchEvent, useEffect, useState } from "react";
+import { TouchEvent } from "react";
 import Square from './Square';
 
 export default function Board() {
@@ -37,7 +37,7 @@ export default function Board() {
         if (mapKey === AppData.data.maze.maxPath.dest) {
             AppData.data.winState = true;
             console.log("Win!");
-            for (let [key, value] of AppData.data.path) {
+            for (const [, value] of AppData.data.path) {
                 value.style.backgroundColor = AppData.constants.winColor;
                 value.className = `square ${AppData.constants.blinkClass}`;
             }
