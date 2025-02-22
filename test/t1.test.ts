@@ -15,20 +15,20 @@ maze3.init();
 const maze4 = new Maze(null, 16, 20);
 maze4.init();
 
-
-const yesterday = new Date("2025-2-17");
-const today = new Date("2025-2-18");
+const key = "2025-02-14";
+// const yesterday = new Date("2025-2-17");
+const today = new Date(key);
 
 const res = {
     mazes: [
         { date: today, mobile: maze1.mazeJsonOutput, desktop: maze2.mazeJsonOutput },
-        { date: yesterday, mobile: maze3.mazeJsonOutput, desktop: maze4.mazeJsonOutput }
+        // { date: yesterday, mobile: maze3.mazeJsonOutput, desktop: maze4.mazeJsonOutput }
     ]
 };
 
 console.log(res);
 
-fs.writeFile('test/mazedata.json', JSON.stringify(res), err => {
+fs.writeFile(`test/${key}_mazedata.json`, JSON.stringify(res), err => {
     if (err) {
         console.error(err);
     } else {

@@ -7,7 +7,7 @@ export const AppData: { data: any, constants: any } = {
         winState: false,
         lastMapKey: null,
         lastElement: null,
-        mazes: null,
+        mazes: new Map<string, any>(),
     },
     constants: {
         pathColor: "#e9cbc5",
