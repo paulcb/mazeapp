@@ -128,15 +128,11 @@ function App() {
         }
       }
       maze = AppData.data.mazes.get(dateKey);
-
-      if (maze != null) {
-        if (isMobile) {
-          AppData.data.maze = new Maze(maze.mobile.data);
-        } else {
-          AppData.data.maze = new Maze(maze.desktop.data);
-        }
-        setCurrentMaze(dateKey);
-      }
+      if (!AppData.data.mazes.has(dateKey)) return;
+      const mazeData = isMobile ? maze.mobile.data : maze.desktop.data;
+      if (mazeData == null) return;
+      AppData.data.maze = new Maze(mazeData);
+      setCurrentMaze(dateKey);
     }
   }, [data, loading]);
 
@@ -163,11 +159,10 @@ function App() {
     AppData.data.path.clear();
     AppData.data.lastElement = null;
     AppData.data.lastMapKey = null;
-    if (isMobile) {
-      AppData.data.maze = new Maze(maze.mobile.data);
-    } else {
-      AppData.data.maze = new Maze(maze.desktop.data);
-    }
+
+    const mazeData = isMobile ? maze.mobile.data : maze.desktop.data;
+    if (mazeData == null) return;
+    AppData.data.maze = new Maze(mazeData);
     setSelected(false);
   }, [selected]);
 
