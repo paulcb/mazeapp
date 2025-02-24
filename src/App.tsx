@@ -1,7 +1,6 @@
 import { AppData } from "./globals";
 
 import React, { ChangeEvent, useEffect, useState } from 'react';
-// import logo from './logo.svg';
 import './App.css';
 import Board from './Board';
 import Maze from './maze'
@@ -12,7 +11,6 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 //   return (
 //     <div className="App">
 //       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
 //         <p>
 //           Edit <code>src/App.tsx</code> and save to reload.
 //         </p>
@@ -96,7 +94,8 @@ function App() {
       const date = new Date();
       const fetchList = [];
       for (let x = 0; x < 10; x++) {
-        date.setDate(date.getDate() - 1);
+        if (x !== 0)
+          date.setDate(date.getDate() - 1);
         let dateKey = `${date.toISOString().split('T')[0]}`;
         fetchList.push(fetchData(dateKey));
       }
@@ -182,7 +181,7 @@ function App() {
           ))}
         </select>
       </div>
-      <p >(v1.5)</p>
+      <p >(v1.6)</p>
     </>
   );
 
