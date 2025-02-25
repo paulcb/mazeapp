@@ -76,7 +76,7 @@ function App() {
       AppData.data.lastElement = null;
       AppData.data.lastMapKey = null;
       if (isMobile) {
-        AppData.data.maze = new Maze(null, 12, 6);
+        AppData.data.maze = new Maze(null, 12, 8);
         AppData.data.maze.init();
       } else {
         AppData.data.maze = new Maze(null, 16, 20);
