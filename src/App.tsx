@@ -1,7 +1,7 @@
 import { AppData } from "./globals";
 
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import './App.css';
+// import './App.css';
 import Board from './Board';
 import Maze from './maze'
 
@@ -175,13 +175,12 @@ function App() {
       <div style={{ float: "left" }}>
         <button className="controls" onClick={onClick}> New </button>
         <select className="controls" name="mazes" id="maze-select" onChange={onChange} value={currentMaze} >
-          {[...mazesDates].map((row, i) => (
+          {[...mazesDates].sort().reverse().map((row, i) => (
             <option key={row + " " + i} className="controls" value={row}>{row}</option>
-
           ))}
         </select>
       </div>
-      <p >(v1.6)</p>
+      <p >(v1.7)</p>
     </>
   );
 

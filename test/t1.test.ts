@@ -2,36 +2,30 @@ import fs from "node:fs";
 
 import Maze from "./../src/maze.ts";
 
-const maze1 = new Maze(null, 12, 6);
-maze1.init();
+const dayCount = 10;
+const date = new Date();
 
-const maze2 = new Maze(null, 16, 20);
-maze2.init();
+for (let x = 0; x < dayCount; x++) {
+    const maze1 = new Maze(null, 12, 8);
+    maze1.init();
 
+    const maze2 = new Maze(null, 16, 20);
+    maze2.init();
+    const dateKey = `${date.toISOString().split('T')[0]}`;
+    const res = {
+        mazes: [
+            { date: date, mobile: maze1.mazeJsonOutput, desktop: maze2.mazeJsonOutput },
+        ]
+    };
 
-const maze3 = new Maze(null, 12, 6);
-maze3.init();
+    console.log(res);
 
-const maze4 = new Maze(null, 16, 20);
-maze4.init();
-
-const key = "2025-02-14";
-// const yesterday = new Date("2025-2-17");
-const today = new Date(key);
-
-const res = {
-    mazes: [
-        { date: today, mobile: maze1.mazeJsonOutput, desktop: maze2.mazeJsonOutput },
-        // { date: yesterday, mobile: maze3.mazeJsonOutput, desktop: maze4.mazeJsonOutput }
-    ]
-};
-
-console.log(res);
-
-fs.writeFile(`test/${key}_mazedata.json`, JSON.stringify(res), err => {
-    if (err) {
-        console.error(err);
-    } else {
-        // file written successfully
-    }
-});
+    fs.writeFile(`test/${dateKey}_mazedata.json`, JSON.stringify(res), err => {
+        if (err) {
+            console.error(err);
+        } else {
+            // file written successfully
+        }
+    });
+    date.setDate(date.getDate() - 1);
+}
