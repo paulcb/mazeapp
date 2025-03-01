@@ -40,8 +40,8 @@ export default class Maze {
     constructor(inputMaze: any,
         rowsLen: number = 16,
         colsLen: number = 6,
-        edgeRate: number = .5,
-        groupRate: number = .68, isInit: boolean = false, debug: boolean = false) {
+        edgeRate: number = .4,
+        groupRate: number = .95, isInit: boolean = false, debug: boolean = false) {
 
         this.board = [];
         this.graph = new Map();

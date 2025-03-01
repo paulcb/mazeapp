@@ -180,7 +180,7 @@ function App() {
           ))}
         </select>
       </div>
-      <p >(v1.7)</p>
+      <p >(v1.8)</p>
     </>
   );
 
